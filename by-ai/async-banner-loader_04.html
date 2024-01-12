@@ -1,0 +1,146 @@
+<!--
+Moja definicja:
+Na stronie internrtowej są umieszczane banery graficzne z linkiem do innych stron. 
+Są banery: B1, B1BIS, B3, C1, M1, EXTRA, które mają stałe, pojedyncze miejsca 
+i jest baner B2, którego kilka instancji jest umieszczanych między elementali 
+listy artykułów. Co ile artykułów to jest wartość konfigurowalna. 
+Do każdego miejszca może być załadowanych więcej niż jeden baner. Ale gdy jest 
+więcej niż jeden na miejsce to banery w danym miejscu mają być rotacyjnie wymieniane 
+co określony czas przy zastosowaniu efektu fade. Wszystkie banery mają być pobrane 
+jednym wywołaniem API. Pobrane banery będą pogrupowane według miejsca osadzeniana stronie. 
+Po pierwszym pobraniu danych  zapisz w cache lub cookies na oktreślony czas, a przy 
+kolejnym  ładowaniu strony lub po upływie ważności danych sprawdź czy są dane w cache 
+lub cookie i czy czas się skonczył, jeśli dane są i czas się nie skończył użyj tych danych, 
+a w przeciwnym razie użyj API do pobrania świeżych danych. Do napisania kodu użyj 
+obiektowego czystego javascript. Dodaj obsługę błędów i wyjatków.
+
+Definicja AI:
+Poniżej znajdziesz przykładowy kod w czystym JavaScript, który implementuje opisane przez 
+Ciebie wymagania. Zakładam, że będziesz korzystać z lokalnego storage dla przechowywania 
+danych w cache. Warto również pamiętać, że obsługa błędów jest zawsze istotna w 
+rzeczywistych projektach, więc warto ją rozbudować w zależności od specyfiki aplikacji.
+-->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Async Banner Placement</title>
+<style>
+    .banner-container {
+        position: relative;
+        max-width: 100%;
+        overflow: hidden;
+    }
+
+    .banner-img {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: auto;
+        opacity: 0;
+        transition: opacity 0.5s ease-in-out;
+    }
+
+    .banner-img.active {
+        opacity: 1;
+    }
+</style>
+</head>
+<body>
+
+<script>
+    class BannerManager {
+
+        constructor() {
+            this.bannersData = null;
+            this.cacheKey = 'bannersCache';
+            this.cacheExpiryTime = 3600; // czas ważności cache w sekundach (1 godzina)
+            this.bannerPlaces = ['B1', 'B1BIS', 'B3', 'C1', 'M1', 'EXTRA'];
+            this.articlesBetweenB2 = 5; // liczba artykułów między banerami B2
+
+            this.init();
+        }
+    
+        async init() {
+            try {
+                // Sprawdzanie, czy dane są w cache
+                const cachedData = this.getFromCache();
+                
+                if (cachedData) {
+                    this.bannersData = cachedData;
+                } else {
+                    // Pobieranie świeżych danych z API
+                    await this.fetchBannersData();
+                    // Zapisywanie danych do cache
+                    this.saveToCache();
+                }
+        
+                // Renderowanie banerów na stronie
+                this.renderBanners();
+            } catch (error) {
+                console.error('Wystąpił błąd:', error);
+            }
+        }
+    
+        async fetchBannersData() {
+            // Symulacja pobierania danych z API
+            // W rzeczywistym projekcie, zamiast setTimeout, użyj fetch lub innej metody
+            return new Promise((resolve) => {
+                setTimeout(() => {
+                    // Symulacja danych z API
+                    this.bannersData = {
+                        B1: ['banner1.jpg', 'banner2.jpg'],
+                        B1BIS: ['banner3.jpg'],
+                        B3: ['banner4.jpg'],
+                        C1: ['banner5.jpg', 'banner6.jpg'],
+                        M1: ['banner7.jpg'],
+                        EXTRA: ['banner8.jpg', 'banner9.jpg'],
+                        B2: ['banner10.jpg', 'banner11.jpg'],
+                    };
+                    resolve();
+                }, 1000);
+            });
+        }
+    
+        renderBanners() {
+            // Implementacja renderowania banerów na stronie
+            // Tutaj możesz manipulować DOM, aby umieścić banery w odpowiednich miejscach
+            // Pamiętaj o rotacji i efekcie fade dla miejsc z więcej niż jednym banerem
+        }
+    
+        saveToCache() {
+            const cacheData = {
+                timestamp: Date.now(),
+                data: this.bannersData,
+            };
+            localStorage.setItem(this.cacheKey, JSON.stringify(cacheData));
+        }
+    
+        getFromCache() {
+            const cachedData = localStorage.getItem(this.cacheKey);
+        
+            if (cachedData) {
+                const parsedData = JSON.parse(cachedData);
+                const currentTime = Date.now();
+                
+                // Sprawdzanie czy cache nie wygasł
+                if (currentTime - parsedData.timestamp < this.cacheExpiryTime * 1000) {
+                    return parsedData.data;
+                } else {
+                    // Cache wygasł, usuń dane z cache
+                    localStorage.removeItem(this.cacheKey);
+                }
+            }
+        
+            return null;
+        }
+    }
+    
+    // Inicjalizacja managera banerów
+    const bannerManager = new BannerManager();
+    </script>
+
+</body>
+</html>

@@ -1,0 +1,134 @@
+<!-- 
+Poniżej znajdziesz przykładowy kod JavaScript, który może być używany 
+na stronie internetowej do asynchronicznego ładowania banerów za pomocą API. 
+W kodzie zakłada się, że istnieje pewna ilość miejsc na banery 
+(zdefiniowanych przez X), a jedno z miejsc jest powtarzane 
+co N elementów na liście artykułów.
+-->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Async Banner Loader</title>
+    <style>
+        .banner-container {
+            position: relative;
+            max-width: 100%;
+            overflow: hidden;
+        }
+
+        .banner-img {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: auto;
+            opacity: 0;
+            transition: opacity 0.5s ease-in-out;
+        }
+
+        .banner-img.active {
+            opacity: 1;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>Asynchronous Banner Loader</h1>
+
+    <h3>Banner Positions 1</h3>
+    <div id="bannerContainer1" class="banner-container"></div>
+    <h3>Banner Positions 2</h3>
+    <div id="bannerContainer2" class="banner-container"></div>
+
+    <div id="articlesList">
+        <!-- List of articles with repeating banner position -->
+        <div class="article">Article 1</div>
+        <div class="article">Article 2</div>
+        <div class="article">Article 3</div>
+        <h3>Banner Positions 3</h3>
+        <div class="article with-banner">Article with Banner</div>
+        <div class="article">Article 4</div>
+        <div class="article">Article 5</div>
+        <!-- ... more articles ... -->
+    </div>
+
+    <script>
+        /**
+        W kodzie tym używamy jednej instancji klasy `BannerLoader`, 
+        która zarządza wszystkimi miejscami na stronie. 
+        Banery są ładowane asynchronicznie za pomocą fetch API, 
+        a zmiany banerów są animowane efektem fade przy użyciu CSS transitions. 
+        Pamiętaj, aby dostosować to do swoich potrzeb, w tym miejsca na banery, 
+        endpoint API oraz interwał zmiany banerów.
+        */
+        class BannerLoader {
+            constructor(bannerPositions, apiUrl, intervalInSeconds) {
+                this.bannerPositions = bannerPositions;
+                this.apiUrl = apiUrl;
+                this.intervalInSeconds = intervalInSeconds;
+                this.banners = {};
+
+                this.loadBanners();
+            }
+
+            async loadBanner(position) {
+                const response = await fetch(`${this.apiUrl}?position=${position}`);
+                const bannerUrl = await response.json();
+
+                return bannerUrl;
+            }
+
+            async loadBanners() {
+                for (const position of this.bannerPositions) {
+                    this.banners[position] = [];
+                    const bannerUrl = await this.loadBanner(position);
+                    this.banners[position].push(bannerUrl);
+                    this.displayBanner(position, bannerUrl);
+                }
+
+                // Change banners at specified intervals
+                setInterval(() => {
+                    for (const position in this.banners) {
+                        this.changeBanner(position);
+                    }
+                }, this.intervalInSeconds * 1000);
+            }
+
+            displayBanner(position, url) {
+                const img = new Image();
+                img.src = url;
+                img.className = 'banner-img';
+                img.alt = `Banner at position ${position}`;
+
+                // Append the image to the container
+                document.getElementById(`bannerContainer${position}`).appendChild(img);
+            }
+
+            changeBanner(position) {
+                const banners = this.banners[position];
+                const container = document.getElementById(`bannerContainer${position}`);
+                const currentBannerIndex = banners.findIndex(banner => banner.classList && banner.classList.contains('active'));
+                const nextBannerIndex = (currentBannerIndex + 1) % banners.length;
+
+                // Fade out the current banner
+                if (currentBannerIndex !== -1) {
+                banners[currentBannerIndex].classList.remove('active');
+                }
+
+                // Fade in the next banner
+                banners[nextBannerIndex].classList.add('active');
+            }
+        }
+
+        // Example usage
+        const bannerPositions = [1, 2]; // Define your banner positions
+        const apiUrl = 'https://api.example.com/banner'; // Replace with your API endpoint
+        const intervalInSeconds = 5;
+
+        const bannerLoader = new BannerLoader(bannerPositions, apiUrl, intervalInSeconds);
+    </script>
+
+</body>
+</html>

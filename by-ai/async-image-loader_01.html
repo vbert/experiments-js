@@ -1,0 +1,83 @@
+<!-- 
+Oto prosty przykład obiektowego kodu w czystym JavaScript, 
+który asynchronicznie załaduje grafiki o określonych typach 
+i rozmiarach co zadaną ilość sekund. 
+W tym przykładzie użyję klasy `ImageLoader`, 
+która będzie zarządzać ładowaniem i wymianą grafik na stronie.
+-->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Async Image Loader</title>
+</head>
+<body>
+
+  <div id="imageContainer"></div>
+
+  <script>
+/*
+Ten kod tworzy obiekt `ImageLoader`, 
+który przyjmuje identyfikator kontenera (`containerId`), 
+listę obiektów obrazów (`imageList`), 
+gdzie każdy obiekt ma właściwości `src`, `width` i `height`, 
+oraz interwał wymiany obrazów w sekundach (`intervalInSeconds`). 
+W przykładowym użyciu, `imageLoader` wymienia obrazy co 5 sekund 
+w elemencie o id `imageContainer`. 
+Możesz dostosować te wartości zgodnie z własnymi potrzebami.
+*/
+    class ImageLoader {
+      constructor(containerId, imageList, intervalInSeconds) {
+        this.container = document.getElementById(containerId);
+        this.imageList = imageList;
+        this.intervalInSeconds = intervalInSeconds;
+        this.currentIndex = 0;
+
+        // Start loading images
+        this.loadImages();
+      }
+
+      async loadImage(src, width, height) {
+        return new Promise((resolve, reject) => {
+          const img = new Image();
+          img.onload = () => resolve(img);
+          img.onerror = reject;
+          img.src = src;
+          img.width = width;
+          img.height = height;
+        });
+      }
+
+      async loadImages() {
+        if (this.currentIndex >= this.imageList.length) {
+          this.currentIndex = 0; // Restart when reaching the end of the image list
+        }
+
+        const { src, width, height } = this.imageList[this.currentIndex];
+        const img = await this.loadImage(src, width, height);
+
+        // Clear the container and append the new image
+        this.container.innerHTML = '';
+        this.container.appendChild(img);
+
+        // Move to the next image after the specified interval
+        setTimeout(() => {
+          this.currentIndex++;
+          this.loadImages();
+        }, this.intervalInSeconds * 1000);
+      }
+    }
+
+    // Example usage
+    const imageList = [
+      { src: '668-300x200.jpg', width: 300, height: 200 },
+      { src: '89-400x300.jpg', width: 400, height: 300 },
+      { src: '316-500x400.jpg', width: 500, height: 400 }
+    ];
+
+    const imageLoader = new ImageLoader('imageContainer', imageList, 5); // Change 5 to the desired interval in seconds
+  </script>
+
+</body>
+</html>

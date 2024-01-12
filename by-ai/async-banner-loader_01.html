@@ -1,0 +1,113 @@
+<!-- 
+Poniżej znajdziesz przykład obiektowego kodu w czystym JavaScript, 
+który używa asynchronicznych żądań API do ładowania banerów graficznych 
+o różnych określonych rozmiarach. 
+Banery są osadzane w określonych miejscach na stronie, 
+a gdy na dane miejsce przypada więcej niż jeden baner, 
+używany jest efekt fade do płynnej zmiany banerów po upływie określonego czasu.
+-->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Async Banner Loader</title>
+    <style>
+        .banner-container {
+        position: relative;
+        max-width: 100%;
+        overflow: hidden;
+        }
+
+        .banner-img {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: auto;
+        opacity: 0;
+        transition: opacity 0.5s ease-in-out;
+        }
+
+        .banner-img.active {
+        opacity: 1;
+        }
+    </style>
+</head>
+<body>
+
+<div id="bannerContainer1" class="banner-container"></div>
+<div id="bannerContainer2" class="banner-container"></div>
+
+<script>
+/*
+Ten kod używa dwóch instancji klasy `BannerLoader`, 
+każda z innym zestawem rozmiarów banerów i innym interwałem zmiany. 
+Bannery są ładowane asynchronicznie z użyciem fetch API, 
+a zmiany banerów są animowane efektem fade przy użyciu CSS transitions. 
+Pamiętaj, że adres URL API (`'https://api.example.com/banner'`) to tylko przykład, 
+a w rzeczywistości powinieneś dostarczyć poprawny adres URL do swojego serwera banerów.
+*/
+    class BannerLoader {
+        constructor(containerId, bannerSizes, apiUrl, intervalInSeconds) {
+            this.container = document.getElementById(containerId);
+            this.bannerSizes = bannerSizes;
+            this.apiUrl = apiUrl;
+            this.intervalInSeconds = intervalInSeconds;
+            this.currentBannerIndex = 0;
+
+            this.loadBanners();
+        }
+
+        async loadBanner(size) {
+            const response = await fetch(`${this.apiUrl}?size=${size}`);
+            const bannerUrl = await response.json();
+
+            return bannerUrl;
+        }
+
+        async loadBanners() {
+            for (const size of this.bannerSizes) {
+                const bannerUrl = await this.loadBanner(size);
+                this.displayBanner(size, bannerUrl);
+            }
+
+            // Change banners at specified intervals
+            setInterval(() => {
+                this.currentBannerIndex = (this.currentBannerIndex + 1) % this.bannerSizes.length;
+                this.changeBanner();
+            }, this.intervalInSeconds * 1000);
+        }
+
+        displayBanner(size, url) {
+            const img = new Image();
+            img.src = url;
+            img.className = 'banner-img';
+            img.alt = `Banner ${size}`;
+
+            // Append the image to the container
+            this.container.appendChild(img);
+        }
+
+        changeBanner() {
+            const banners = this.container.querySelectorAll('.banner-img');
+            const nextBannerIndex = (this.currentBannerIndex + 1) % this.bannerSizes.length;
+
+            // Fade out the current banner
+            banners[this.currentBannerIndex].classList.remove('active');
+
+            // Fade in the next banner
+            banners[nextBannerIndex].classList.add('active');
+        }
+    }
+
+    // Example usage
+    const bannerSizes1 = ['300x250', '728x90', '160x600'];
+    const bannerSizes2 = ['300x600', '468x60', '200x200'];
+
+    const bannerLoader1 = new BannerLoader('bannerContainer1', bannerSizes1, 'https://api.example.com/banner', 5);
+    const bannerLoader2 = new BannerLoader('bannerContainer2', bannerSizes2, 'https://api.example.com/banner', 8);
+  </script>
+
+</body>
+</html>

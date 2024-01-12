@@ -1,0 +1,183 @@
+<!--
+Moja definicja:
+Projekt: obiektowy i asynchroniczny kod javascript do umieszczania banerów 
+określonych rozmiarów w określonych miejscach na stronie www. 
+Podczas ładowania strony załaduj asynchronicznie za pomocą API wszystkie 
+dostępne banery graficzne z linkami url. 
+Pobrane informacje zapisz w cache lub cookies na oktreślony czas, 
+a przy kolejnym  ładowaniu strony sprawdź czy są dane w cache lub cookie 
+i czy czas się skonczył, jeśli dane są i czas się nie skończył użyj tych danych, 
+a w przeciwnym razie użyj API do pobrania świeżych danych. 
+Pobrane banery będą pogrupowane według miejsc na stronie. 
+Są dwa typy miejsc, jeden to miejsca stałe (pojedyncze), a drugie 
+to miejsca powtarzalne znajdujące się co kilka elementów listy artykułów. 
+Gdy na określone miejsce przypada więcej niż jeden baner, 
+wymieniaj go co N sekund za pomocą efektu fade.
+
+Definicja AI:
+Poniżej znajdziesz przykładowy kod JavaScript, który implementuje obiektowy 
+i asynchroniczny projekt do umieszczania banerów o określonych rozmiarach 
+w określonych miejscach na stronie internetowej. 
+Kod korzysta z cache lub cookies do przechowywania pobranych banerów 
+na określony czas i obsługuje dwa typy miejsc: stałe (pojedyncze) i powtarzalne 
+(co kilka elementów listy artykułów). Wymiana banerów w ramach jednego miejsca 
+odbywa się co N sekund za pomocą efektu fade.
+-->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Async Banner Placement</title>
+<style>
+    .banner-container {
+        position: relative;
+        max-width: 100%;
+        overflow: hidden;
+    }
+
+    .banner-img {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: auto;
+        opacity: 0;
+        transition: opacity 0.5s ease-in-out;
+    }
+
+    .banner-img.active {
+        opacity: 1;
+    }
+</style>
+</head>
+<body>
+
+    <div id="fixedBannerContainer" class="banner-container"></div>
+    <div id="repeatingBannerContainer" class="banner-container"></div>
+
+    <div id="articlesList">
+        <!-- List of articles with repeating banner position -->
+        <div class="article">Article 1</div>
+        <div class="article">Article 2</div>
+        <div class="article with-banner">Article with Banner</div>
+        <div class="article">Article 3</div>
+        <div class="article">Article 4</div>
+        <!-- ... more articles ... -->
+    </div>
+
+    <script>
+        /**
+         * W tym przykładzie wykorzystano localStorage do przechowywania danych w cache. 
+         * Pamiętaj, że cache w localStorage jest per-domena, więc upewnij się, 
+         * że jest to odpowiednie dla Twojego przypadku użycia. 
+         * W rzeczywistym środowisku produkcyjnym powinieneś również dodać obsługę błędów, 
+         * zabezpieczenia i zoptymalizować kod zgodnie z własnymi wymaganiami.
+         */
+        class BannerLoader {
+
+            constructor(apiUrl, cacheKey, intervalInSeconds) {
+                this.apiUrl = apiUrl;
+                this.cacheKey = cacheKey;
+                this.intervalInSeconds = intervalInSeconds;
+                this.banners = {};
+
+                this.loadBanners();
+            }
+
+            async loadBanner() {
+                const response = await fetch(this.apiUrl);
+                const bannerData = await response.json();
+                return bannerData;
+            }
+
+            async loadBanners() {
+                const cachedData = this.getCachedData();
+
+                if (cachedData && this.isCacheValid(cachedData.timestamp)) {
+                    this.banners = cachedData.banners;
+                } else {
+                    const bannerData = await this.loadBanner();
+                    this.banners = bannerData;
+                    this.setCachedData(bannerData);
+                }
+
+                this.displayBanners();
+                this.startBannerRotation();
+            }
+
+            getCachedData() {
+                const cachedData = localStorage.getItem(this.cacheKey);
+                return cachedData ? JSON.parse(cachedData) : null;
+            }
+
+            setCachedData(banners) {
+                const timestamp = new Date().getTime();
+                const data = { banners, timestamp };
+                localStorage.setItem(this.cacheKey, JSON.stringify(data));
+            }
+
+            isCacheValid(timestamp) {
+                const currentTime = new Date().getTime();
+                const cacheDuration = 60 * 60 * 1000; // Cache duration in milliseconds (1 hour)
+                return currentTime - timestamp < cacheDuration;
+            }
+
+            displayBanners() {
+                for (const position in this.banners) {
+                    const bannerContainer = document.getElementById(`${position}BannerContainer`);
+                    for (const banner of this.banners[position]) {
+                        this.displayBanner(bannerContainer, banner);
+                    }
+                }
+            }
+
+            displayBanner(container, url) {
+                const img = new Image();
+                img.src = url;
+                img.className = 'banner-img';
+                img.alt = 'Banner';
+
+                // Append the image to the container
+                container.appendChild(img);
+            }
+
+            startBannerRotation() {
+                for (const position in this.banners) {
+                    const banners = this.banners[position];
+                    const container = document.getElementById(`${position}BannerContainer`);
+
+                    if (banners.length > 1) {
+                        // Change banners at specified intervals
+                        setInterval(() => {
+                            this.changeBanner(container);
+                        }, this.intervalInSeconds * 1000);
+                    }
+                }
+            }
+
+            changeBanner(container) {
+                const banners = container.querySelectorAll('.banner-img');
+                const currentBannerIndex = Array.from(banners).findIndex(banner => banner.classList && banner.classList.contains('active'));
+                const nextBannerIndex = (currentBannerIndex + 1) % banners.length;
+
+                // Fade out the current banner
+                if (currentBannerIndex !== -1) {
+                    banners[currentBannerIndex].classList.remove('active');
+                }
+
+                // Fade in the next banner
+                banners[nextBannerIndex].classList.add('active');
+            }
+        }
+
+        // Example usage
+        const apiUrl = 'https://api.example.com/banners'; // Replace with your API endpoint
+        const cacheKey = 'bannerCache';
+        const intervalInSeconds = 5;
+
+        const bannerLoader = new BannerLoader(apiUrl, cacheKey, intervalInSeconds);
+    </script>
+
+</body>
+</html>
