@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Slider 01</title>
+    <link rel="stylesheet" href="./slider.css">
+    <style>
+        .slider-1 {
+            background-image: url('./slide-bg1.jpeg');
+            margin-bottom: 30px;
+        }
+
+        .slider-2 {
+            background-image: url('./slide-bg2.jpeg');
+        }
+    </style>
+</head>
+
+<body>
+    <div class="slider slider-1" id="slider1">
+        <div class="slider-slides">
+            <article class="slider-slide is-active">
+                <h2 class="slider-slide-title">
+                    1 Lorem ipsum dolor sit.
+                </h2>
+                <div class="slider-slide-text">
+                    Lorem ipsum dolor sit amet, consectetur adipisicing elit. Mollitia dolore inventore, ipsam optio.
+                    Magni repellat officia autem fuga, laboriosam facilis?
+                </div>
+            </article>
+            <article class="slider-slide">
+                <h2 class="slider-slide-title">
+                    2 Lorem ipsum dolor sit.
+                </h2>
+                <div class="slider-slide-text">
+                    Lorem ipsum dolor sit amet, consectetur adipisicing elit. Ipsum exercitationem asperiores
+                    perspiciatis sapiente ducimus atque dicta labore dolores sequi ut.
+                </div>
+            </article>
+            <article class="slider-slide">
+                <h2 class="slider-slide-title">
+                    3 Lorem ipsum dolor sit.
+                </h2>
+                <div class="slider-slide-text">
+                    Lorem ipsum dolor sit amet, consectetur adipisicing elit. Repellendus id quas, quia consectetur
+                    repellat quis! Minus voluptatibus, dolores iure deserunt.
+                </div>
+            </article>
+        </div>
+    </div>
+
+    <div class="slider slider-2" id="slider2">
+        <div class="slider-slides">
+            <article class="slider-slide is-active">
+                <h2 class="slider-slide-title">
+                    1 Lorem ipsum dolor sit.
+                </h2>
+                <div class="slider-slide-text">
+                    Lorem ipsum dolor sit amet, consectetur adipisicing elit. Mollitia dolore inventore, ipsam optio.
+                    Magni repellat officia autem fuga, laboriosam facilis?
+                </div>
+            </article>
+            <article class="slider-slide">
+                <h2 class="slider-slide-title">
+                    2 Lorem ipsum dolor sit.
+                </h2>
+                <div class="slider-slide-text">
+                    Lorem ipsum dolor sit amet, consectetur adipisicing elit. Ipsum exercitationem asperiores
+                    perspiciatis sapiente ducimus atque dicta labore dolores sequi ut.
+                </div>
+            </article>
+            <article class="slider-slide">
+                <h2 class="slider-slide-title">
+                    3 Lorem ipsum dolor sit.
+                </h2>
+                <div class="slider-slide-text">
+                    Lorem ipsum dolor sit amet, consectetur adipisicing elit. Repellendus id quas, quia consectetur
+                    repellat quis! Minus voluptatibus, dolores iure deserunt.
+                </div>
+            </article>
+        </div>
+    </div>
+
+    <script src="./slider.js"></script>
+    <script>
+        //automatyczny slider bez paginacji i strzałek
+        const options1 = {
+            pauseTime : 3000,
+        }
+        const slider1 = new Slider("#slider1", options1);
+
+        // //manualny slider z przyciskami
+        // const options2 = {
+        //     pauseTime : 0,
+        //     generatePrevNext : false,
+        //     generatePagination : false
+        // }
+        // const slide2 = new Slider("#slider2", options2);
+    </script>
+</body>
+
+</html>
