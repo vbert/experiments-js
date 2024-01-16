@@ -44,7 +44,7 @@ class Slider {
             slide.classList.remove("is-active");
         });
 
-        //dodajemy jÄ tylko wybranemu
+        //dodajemy ją tylko wybranemu
         this.slides[index].classList.add("is-active");
 
         //podobny manewr robimy dla kropek
