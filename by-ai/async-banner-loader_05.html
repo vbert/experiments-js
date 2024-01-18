@@ -1,0 +1,124 @@
+<!-- 
+Poniżej znajdziesz przykładowy kod JavaScript, który może być używany 
+na stronie internetowej do asynchronicznego ładowania banerów za pomocą API. 
+W kodzie zakłada się, że istnieje pewna ilość miejsc na banery 
+(zdefiniowanych przez X), a jedno z miejsc jest powtarzane 
+co N elementów na liście artykułów.
+-->
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Async Banner Loader</title>
+    <style>
+        .banner-container {
+            position: relative;
+            max-width: 100%;
+            overflow: hidden;
+        }
+
+        .banner-img {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: auto;
+            opacity: 0;
+            transition: opacity 0.5s ease-in-out;
+        }
+
+        .banner-img.active {
+            opacity: 1;
+        }
+    </style>
+</head>
+
+<body>
+
+    <h1>Asynchronous Banner Loader</h1>
+
+    <h3>Banner Positions 1</h3>
+    <div id="bannerContainer1" class="banner-container"></div>
+    <h3>Banner Positions 2</h3>
+    <div id="bannerContainer2" class="banner-container"></div>
+
+    <div id="articlesList">
+        <!-- List of articles with repeating banner position -->
+        <div class="article">Article 1</div>
+        <div class="article">Article 2</div>
+        <div class="article">Article 3</div>
+        <h3>Banner Positions 3</h3>
+        <div class="article with-banner">Article with Banner</div>
+        <div class="article">Article 4</div>
+        <div class="article">Article 5</div>
+        <!-- ... more articles ... -->
+    </div>
+
+    <script>
+        /**
+        Poniżej znajdziesz przykład klasy w czystym JavaScript, 
+        która pobiera asynchronicznie dane przez API, 
+        przechowuje je w cache na określony czas 
+        i udostępnia metodę do ich zwracania:
+        */
+        class ApiDataFetcher {
+            constructor(apiUrl, cacheDurationInSeconds = 60) {
+                this.apiUrl = apiUrl;
+                this.cacheDuration = cacheDurationInSeconds * 1000; // Convert seconds to milliseconds
+                this.data = null;
+                this.cacheTimestamp = null;
+            }
+
+            async fetchData() {
+                if (this.shouldUseCache()) {
+                    return this.data;
+                }
+
+                try {
+                    const response = await fetch(this.apiUrl);
+                    if (!response.ok) {
+                        throw new Error(`Failed to fetch data. Status: ${response.status}`);
+                    }
+
+                    this.data = await response.json();
+                    this.cacheTimestamp = new Date().getTime();
+                    return this.data;
+                } catch (error) {
+                    console.error('Error fetching data:', error.message);
+                    throw error;
+                }
+            }
+
+            shouldUseCache() {
+                return this.data !== null && this.cacheTimestamp !== null && (new Date().getTime() - this.cacheTimestamp) < this.cacheDuration;
+            }
+
+            getData() {
+                return this.data;
+            }
+        }
+
+        // Przykładowe użycie
+        const apiUrl = 'http://localhost/weekendfm.pl/api/get-banners.php';
+        const cacheDurationInSeconds = 60; // Cache duration in seconds
+        const dataFetcher = new ApiDataFetcher(apiUrl, cacheDurationInSeconds);
+        let fetchedData = {};
+
+        // Wywołanie metody fetchData asynchronicznie
+        dataFetcher.fetchData()
+            .then(() => {
+                // Pobranie danych za pomocą metody getData po zakończeniu żądania
+                fetchedData = dataFetcher.getData();
+                console.log('Fetched Data:', fetchedData.banners);
+            })
+            .catch((error) => {
+                console.error('An error occurred:', error);
+            });
+
+    </script>
+
+</body>
+
+</html>
