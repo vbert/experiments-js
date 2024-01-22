@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Fading Banner</title>
+  <style>
+    .banner-container {
+      position: relative;
+      width: 300px; /* Dostosuj szerokość i wysokość kontenera do potrzeb */
+      height: 200px;
+      overflow: hidden;
+    }
+
+    .banner-img {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: auto;
+      opacity: 0;
+      transition: opacity 5s ease-in-out;
+    }
+
+    .banner-img.active {
+      opacity: 1;
+    }
+  </style>
+</head>
+<body>
+
+  <div id="bannerContainer" class="banner-container">
+    <img src="first-banner.jpg" alt="Banner 1" class="banner-img active">
+  </div>
+
+  <script>
+    // Przykładowe dane banerów
+    const banners = [
+      { src: 'first-banner.jpg', alt: 'Banner 1', link: 'https://petrus.pl' },
+      { src: 'second-banner.jpg', alt: 'Banner 2', link: 'https://weekendfm.pl' },
+      { src: 'third-banner.jpg', alt: 'Banner 3', link: 'https://google.pl' },
+    ];
+
+    let currentBannerIndex = 0;
+
+    function changeBanner() {
+      const bannerContainer = document.getElementById('bannerContainer');
+      const currentBanner = bannerContainer.querySelector('.banner-img.active');
+
+      currentBanner.classList.remove('active');
+
+      currentBannerIndex = (currentBannerIndex + 1) % banners.length;
+      const newBanner = document.createElement('img');
+      newBanner.src = banners[currentBannerIndex].src;
+      newBanner.alt = banners[currentBannerIndex].alt;
+      newBanner.classList.add('banner-img');
+      newBanner.classList.add('active');
+
+      // Dodaj nowy baner do kontenera
+      bannerContainer.appendChild(newBanner);
+
+      // Usuń poprzedni baner po zakończeniu animacji
+      currentBanner.addEventListener('transitionend', function() {
+        currentBanner.remove();
+      });
+    }
+
+    // Ustaw interwał wymiany banerów
+    setInterval(changeBanner, 5000); // Zmiana co 5 sekund (5000 milisekund)
+  </script>
+
+</body>
+</html>
