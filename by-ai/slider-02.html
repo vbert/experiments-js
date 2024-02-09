@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+    .slider-container {
+      width: 300px;
+      overflow: hidden;
+    }
+
+    .slider-wrapper {
+      display: flex;
+      transition: transform 0.5s ease-in-out;
+    }
+
+    .slide {
+      width: 300px;
+      flex-shrink: 0;
+    }
+
+    .slider-button {
+      cursor: pointer;
+      padding: 10px;
+      background-color: #ddd;
+      border: none;
+      margin: 5px;
+    }
+
+    .tooltip {
+      position: absolute;
+      display: none;
+      padding: 5px;
+      background-color: #333;
+      color: #fff;
+      border-radius: 5px;
+      z-index: 1000;
+    }
+  </style>
+</head>
+<body>
+
+<div class="slider-container" id="mySlider">
+  <div class="slider-wrapper">
+    <div class="slide" id="slide1">
+      <svg width="100" height="100">
+        <path d="M10 10 L90 90" stroke="black" stroke-width="2" fill="transparent" rel="unique1"></path>
+        <path d="M10 90 L90 10" stroke="red" stroke-width="2" fill="transparent" rel="unique2"></path>
+        <!-- Dodaj więcej elementów path z różnymi wartościami właściwości rel -->
+      </svg>
+    </div>
+    <div class="slide" id="slide2">
+      <svg width="100" height="100">
+        <path d="M20 20 L80 80" stroke="blue" stroke-width="2" fill="transparent" rel="unique3"></path>
+        <path d="M20 80 L80 20" stroke="green" stroke-width="2" fill="transparent" rel="unique4"></path>
+        <!-- Dodaj więcej elementów path z różnymi wartościami właściwości rel -->
+      </svg>
+    </div>
+    <!-- Dodaj więcej slajdów z odpowiednimi kodami SVG i unikalnymi identyfikatorami id -->
+  </div>
+</div>
+
+<button class="slider-button" id="mySliderPrev">Poprzedni</button>
+<button class="slider-button" id="mySliderNext">Następny</button>
+<div id="slider-dots" style="text-align: center; margin-top: 10px;"></div>
+
+<script>
+  class SimpleSlider {
+    constructor(containerId, config = {}) {
+      this.container = document.getElementById(containerId);
+      this.wrapper = this.container.querySelector('.slider-wrapper');
+      this.slides = this.container.querySelectorAll('.slide');
+      this.currentIndex = 0;
+      this.totalSlides = this.slides.length;
+      this.slideWidth = this.slides[0].offsetWidth;
+
+      // Konfiguracja domyślna z możliwością nadpisania przez przekazany obiekt konfiguracyjny
+      this.config = {
+        showButtons: true,
+        showDots: true,
+        ...config,
+      };
+
+      this.init();
+    }
+
+    init() {
+      this.createDots();
+      this.addListeners();
+
+      // Sprawdzenie i konfiguracja wyświetlania przycisków
+      if (!this.config.showButtons) {
+        this.hideButtons();
+      }
+
+      // Sprawdzenie i konfiguracja wyświetlania kropek nawigacyjnych
+      if (!this.config.showDots) {
+        this.hideDots();
+      }
+
+      this.handleGoToElements();
+      this.initTooltips();
+    }
+
+    nextSlide() {
+      if (this.currentIndex < this.totalSlides - 1) {
+        this.currentIndex++;
+      } else {
+        this.currentIndex = 0;
+      }
+      this.updateSlider();
+    }
+
+    prevSlide() {
+      if (this.currentIndex > 0) {
+        this.currentIndex--;
+      } else {
+        this.currentIndex = this.totalSlides - 1;
+      }
+      this.updateSlider();
+    }
+
+    goToSlide(id) {
+      const index = Array.from(this.slides).findIndex(slide => slide.id === id);
+      if (index !== -1) {
+        this.currentIndex = index;
+        this.updateSlider();
+      }
+    }
+
+    updateSlider() {
+      const newTransformValue = -this.currentIndex * this.slideWidth;
+      this.wrapper.style.transform = `translateX(${newTransformValue}px)`;
+      this.updateSliderDots();
+    }
+
+    updateSliderDots() {
+      this.sliderDotsContainer.innerHTML = '';
+      for (let i = 0; i < this.totalSlides; i++) {
+        const dot = document.createElement('span');
+        dot.className = 'slider-dot';
+        dot.textContent = i + 1;
+        dot.addEventListener('click', () => this.goToSlide(this.slides[i].id));
+        this.sliderDotsContainer.appendChild(dot);
+      }
+    }
+
+    createDots() {
+      this.sliderDotsContainer = document.getElementById('slider-dots');
+      this.updateSliderDots();
+    }
+
+    hideButtons() {
+      document.getElementById('mySliderPrev').style.display = 'none';
+      document.getElementById('mySliderNext').style.display = 'none';
+    }
+
+    hideDots() {
+      this.sliderDotsContainer.style.display = 'none';
+    }
+
+    addListeners() {
+      if (this.config.showButtons) {
+        document.getElementById('mySliderPrev').addEventListener('click', () => this.prevSlide());
+        document.getElementById('mySliderNext').addEventListener('click', () => this.nextSlide());
+      }
+      
+      this.slides.forEach(slide => {
+        slide.addEventListener('click', () => this.goToSlide(slide.id));
+      });
+    }
+
+    handleGoToElements() {
+      const goToElements = document.querySelectorAll('.go-to');
+      goToElements.forEach(element => {
+        const goalId = element.dataset.goal;
+        const relValue = element.getAttribute('rel');
+        if (goalId) {
+          element.addEventListener('click', () => this.goToSlide(goalId));
+        }
+        if (relValue) {
+          element.addEventListener('click', () => console.log(`Clicked element with rel="${relValue}"`));
+        }
+      });
+    }
+
+    initTooltips() {
+      this.tooltip = new Tooltip();
+      this.slides.forEach(slide => {
+        const paths = slide.querySelectorAll('path');
+        paths.forEach(path => {
+          const relValue = path.getAttribute('rel');
+          if (relValue) {
+            path.addEventListener('mouseover', (event) => this.showTooltip(event, relValue));
+            path.addEventListener('mouseout', () => this.hideTooltip());
+          }
+        });
+      });
+    }
+
+    showTooltip(event, content) {
+      this.tooltip.show(event, content);
+    }
+
+    hideTooltip() {
+      this.tooltip.hide();
+    }
+  }
+
+  class Tooltip {
+    constructor() {
+      this.tooltipElement = document.createElement('div');
+      this.tooltipElement.className = 'tooltip';
+      document.body.appendChild(this.tooltipElement);
+    }
+
+    show(event, content) {
+      this.tooltipElement.textContent = content;
+      this.tooltipElement.style.display = 'block';
+      this.updatePosition(event);
+    }
+
+    hide() {
+      this.tooltipElement.style.display = 'none';
+    }
+
+    updatePosition(event) {
+      const offsetX = 10;
+      const offsetY = 10;
+
+      const tooltipWidth = this.tooltipElement.offsetWidth;
+      const tooltipHeight = this.tooltipElement.offsetHeight;
+
+      const windowWidth = window.innerWidth;
+      const windowHeight = window.innerHeight;
+
+      const x = event.clientX + offsetX;
+      const y = event.clientY + offsetY;
+
+      this.tooltipElement.style.left = `${Math.min(x, windowWidth - tooltipWidth)}px`;
+      this.tooltipElement.style.top = `${Math.min(y, windowHeight - tooltipHeight)}px`;
+    }
+  }
+
+  document.addEventListener('DOMContentLoaded', function () {
+    const mySlider = new SimpleSlider('mySlider', {
+      showButtons: true,  // Ustaw na false, aby ukryć przyciski
+      showDots: true,     // Ustaw na false, aby ukryć kropki nawigacyjne
+    });
+  });
+</script>
+
+</body>
+</html>

@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        .slider-container {
+            width: 300px;
+            overflow: hidden;
+        }
+
+        .slider-wrapper {
+            display: flex;
+            transition: transform 0.5s ease-in-out;
+        }
+
+        .slide {
+            width: 300px;
+            flex-shrink: 0;
+            color: inherit;
+        }
+
+        .s1 {
+            background-color: red;
+
+        }
+
+        .s2 {
+            background-color: blue;
+        }
+
+        .s3 {
+            background-color: black;
+        }
+
+        .s4 {
+            background-color: green;
+        }
+
+        .slider-dots {
+            width: 300px;
+            margin: .525rem 0;
+            display: flex;
+            flex-direction: row;
+            justify-content: center;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .slider-dot {
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            background-color: #ddd;
+            color: #204e8a;
+            line-height: 24px;
+            text-align: center;
+            cursor: pointer;
+        }
+
+        .slider-dot:hover {
+            background-color: #204e8a;
+            color: #fff;
+        }
+
+        .slider-buttons {
+            width: 300px;
+            margin: .525rem 0;
+            display: flex;
+            flex-direction: row;
+            justify-content: center;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .slider-button {
+            cursor: pointer;
+            padding: 10px;
+            background-color: #ddd;
+            border: none;
+            margin: 5px;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="slider-container" id="mySlider">
+        <div class="slider-wrapper">
+            <div class="slide s1" id="slide1">
+                <svg width="100" height="100">
+                    <!-- Twój kod SVG dla pierwszego slajdu -->
+                </svg>
+            </div>
+            <div class="slide s2" id="slide2">
+                <svg width="100" height="100">
+                    <!-- Twój kod SVG dla drugiego slajdu -->
+                </svg>
+            </div>
+            <div class="slide s3" id="slide3">
+                <svg width="100" height="100">
+                    <!-- Twój kod SVG dla drugiego slajdu -->
+                </svg>
+            </div>
+            <div class="slide s4" id="slide4">
+                <button class="go-to" data-goal="slide2">Idź do slajdu 2</button>
+                <svg width="100" height="100">
+                    <!-- Twój kod SVG dla drugiego slajdu -->
+                </svg>
+            </div>
+        </div>
+    </div>
+
+    <div id="slider-dots" class="slider-dots"></div>
+
+    <div class="slider-buttons">
+        <button class="slider-button" id="mySliderPrev">Poprzedni</button>
+        <button class="slider-button" id="mySliderNext">Następny</button>
+    </div>
+
+    <script>
+        class SimpleSlider {
+            constructor(containerId, config = {}) {
+                this.container = document.getElementById(containerId);
+                this.wrapper = this.container.querySelector('.slider-wrapper');
+                this.slides = this.container.querySelectorAll('.slide');
+                this.currentIndex = 0;
+                this.totalSlides = this.slides.length;
+                this.slideWidth = this.slides[0].offsetWidth;
+
+                // Konfiguracja domyślna z możliwością nadpisania przez przekazany obiekt konfiguracyjny
+                this.config = {
+                    showButtons: true,
+                    showDots: true,
+                    ...config,
+                };
+
+                this.init();
+            }
+
+            init() {
+                this.createDots();
+                this.addListeners();
+
+                // Sprawdzenie i konfiguracja wyświetlania przycisków
+                if (!this.config.showButtons) {
+                    this.hideButtons();
+                }
+
+                // Sprawdzenie i konfiguracja wyświetlania kropek nawigacyjnych
+                if (!this.config.showDots) {
+                    this.hideDots();
+                }
+
+                this.handleGoToElements();
+            }
+
+            nextSlide() {
+                if (this.currentIndex < this.totalSlides - 1) {
+                    this.currentIndex++;
+                } else {
+                    this.currentIndex = 0;
+                }
+                this.updateSlider();
+            }
+
+            prevSlide() {
+                if (this.currentIndex > 0) {
+                    this.currentIndex--;
+                } else {
+                    this.currentIndex = this.totalSlides - 1;
+                }
+                this.updateSlider();
+            }
+
+            goToSlide(id) {
+                console.log(id);
+                const index = Array.from(this.slides).findIndex(slide => slide.id === id);
+                if (index !== -1) {
+                    this.currentIndex = index;
+                    this.updateSlider();
+                }
+            }
+
+            updateSlider() {
+                const newTransformValue = -this.currentIndex * this.slideWidth;
+                this.wrapper.style.transform = `translateX(${newTransformValue}px)`;
+                this.updateSliderDots();
+            }
+
+            updateSliderDots() {
+                this.sliderDotsContainer.innerHTML = '';
+                for (let i = 0; i < this.totalSlides; i++) {
+                    const dot = document.createElement('span');
+                    dot.className = 'slider-dot';
+                    dot.textContent = i + 1;
+                    dot.addEventListener('click', () => this.goToSlide(this.slides[i].id));
+                    this.sliderDotsContainer.appendChild(dot);
+                }
+            }
+
+            createDots() {
+                this.sliderDotsContainer = document.getElementById('slider-dots');
+                this.updateSliderDots();
+            }
+
+            hideButtons() {
+                document.getElementById('mySliderPrev').style.display = 'none';
+                document.getElementById('mySliderNext').style.display = 'none';
+            }
+
+            hideDots() {
+                this.sliderDotsContainer.style.display = 'none';
+            }
+
+            addListeners() {
+                if (this.config.showButtons) {
+                    document.getElementById('mySliderPrev').addEventListener('click', () => this.prevSlide());
+                    document.getElementById('mySliderNext').addEventListener('click', () => this.nextSlide());
+                }
+
+                // this.slides.forEach(slide => {
+                //     slide.addEventListener('click', () => this.goToSlide(slide.id));
+                // });
+            }
+
+            handleGoToElements() {
+                const goToElements = document.querySelectorAll('.go-to');
+
+                console.log(goToElements);
+
+                goToElements.forEach(element => {
+                    const goalId = element.dataset.goal;
+
+                    if (goalId) {
+                        console.log(goalId);
+                        element.addEventListener('click', () => this.goToSlide(goalId));
+                    }
+                });
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', function () {
+            const mySlider = new SimpleSlider('mySlider', {
+                showButtons: true,  // Ustaw na false, aby ukryć przyciski
+                showDots: false,     // Ustaw na false, aby ukryć kropki nawigacyjne
+            });
+        });
+    </script>
+
+</body>
+
+</html>
