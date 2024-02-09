@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Election 01</title>
+</head>
+<body>
+    <div class="content"></div>
+    <script>
+        class Candidate {
+            constructor(firsName, lastName, age, educatin, address, committeeId, mayorType, promo = {}) {
+                this.firsName = firsName;
+                this.lastName = lastName;
+                this.age = age;
+                this.educatin = educatin; // wykształcenie
+                this.address = address;
+                this.committeeId = committeeId; // komitet wyborczy
+                this.mayorType = mayorType; // wójt || burmistrz
+                this.promo = {
+                    isFree: true,
+                    image: '', // zdjęcie kandydata
+                    banner: '', // banner reklamowy
+                    sponsor: '', // nazwa sponsora
+                    ...promo
+                };
+            }
+        }
+
+        class ElectoralDistrict {
+            constructor(id, name) {
+                this.id = id;
+                this.name = name;
+                this.candidates = [];
+            }
+
+            addCandidate(candidate) {
+                this.candidates.push(candidate);
+            }
+
+            listCandidates() {
+                return this.candidates.map(candidate => candidate.firsName + ' ' + candidate.lastName);
+            }
+        }
+
+        class ElectoralDistricts {
+            constructor() {
+                this.districts = [];
+            }
+
+            addDistrict(district) {
+                this.districts.push(district);
+            }
+
+            searchDistrict(id) {
+                return this.districts.find(district => district.id === id);
+            }
+
+            listCandidatesOfDistrict(id) {
+                const district = this.searchDistrict(id);
+
+                if (district) {
+                    return district.listCandidates();
+                } else {
+                    return 'Okręg wyborczy o id ' + id + ' nie został znaleziony.';
+                }
+            }
+        }
+
+        // Inicjalizacja okręgów wyborczych
+        const districts = new ElectoralDistricts();
+
+    </script>
+</body>
+</html>
