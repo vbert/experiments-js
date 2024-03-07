@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+    /* Dodaj styl do tooltipa */
+    .tooltip {
+      position: absolute;
+      background-color: #333;
+      color: #fff;
+      padding: 5px;
+      border-radius: 3px;
+      display: none;
+    }
+  </style>
+</head>
+<body>
+
+<div class="map">
+  <svg class="map_svg">
+    <a xlink:href="#">
+      <path rel="m. Człuchów" d="..." onmouseover="showTooltip(event, this)"></path>
+    </a>
+    <a xlink:href="#">
+      <path rel="m. Bytów" d="..." onmouseover="showTooltip(event, this)"></path>
+    </a>
+  </svg>
+</div>
+
+<!-- Dodaj div dla tooltipa -->
+<div class="tooltip" id="tooltip"></div>
+
+<script>
+  // Funkcja do wyświetlania tooltipa
+  function showTooltip(event, element) {
+    // Pobierz wartość atrybutu rel z elementu path
+    var relValue = element.getAttribute('rel');
+
+    // Pobierz pozycję myszy
+    var mouseX = event.clientX;
+    var mouseY = event.clientY;
+
+    // Ustaw pozycję tooltipa i jego treść
+    var tooltip = document.getElementById('tooltip');
+    tooltip.style.left = mouseX + 'px';
+    tooltip.style.top = mouseY + 'px';
+    tooltip.innerHTML = relValue;
+
+    // Wyświetl tooltip
+    // Dodaj zdarzenie do ukrywania tooltipa po opuszczeniu elementu path
+    document.addEventListener('mouseout', function (event) {
+      var tooltip = document.getElementById('tooltip');
+    tooltip.style.display = 'block';
+  }
+
+    tooltip.style.display = 'none';
+  });
+</script>
+
+</body>
+</html>
