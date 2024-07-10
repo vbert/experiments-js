@@ -44,10 +44,11 @@ document.getElementById('uploadButton').addEventListener('click', function() {
   const croppedCanvas = document.getElementById('croppedCanvas');
   croppedCanvas.toBlob(function(blob) {
     const formData = new FormData();
-    formData.append('file', blob, 'cropped_image.png');
+    const fileName = 'cropped_image.png';
+    formData.append('file', blob, fileName);
 
     // Replace with your server upload URL
-    const uploadUrl = 'upload/'; // 'YOUR_UPLOAD_URL_HERE';
+    const uploadUrl = `http://localhost/experiments-js/cropper-02/upload/${fileName}`; // 'YOUR_UPLOAD_URL_HERE';
     fetch(uploadUrl, {
       method: 'POST',
       body: formData
