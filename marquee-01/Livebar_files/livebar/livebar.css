@@ -1,0 +1,85 @@
+@keyframes marquee-scroll-x {
+    0% {
+        transform: translate(2rem);
+    }
+
+    to {
+        transform: translate(calc(-100% + 2rem));
+    }
+}
+
+@keyframes marquee-rapaint {
+    0% {
+        width: 99.999%;
+    }
+
+    to {
+        width: 100%;
+    }
+}
+
+.marquee__wrapper {
+    display: flex;
+    flex-direction: row;
+    height: 32px;
+    overflow: hidden;
+    position: relative;
+}
+
+.marquee__wrapper:hover .marquee__group {
+    animation-play-state: paused;
+}
+
+.marquee,
+.marquee * {
+    box-sizing: border-box;
+}
+
+.marquee {
+    width: 100%;
+    display: flex;
+    overflow: hidden;
+    font-family: "Fira Sans", sans-serif;
+    font-size: 1rem;
+    user-select: none;
+    animation: marquee-rapaint 30s infinite;
+}
+
+.marquee a {
+    text-decoration: none;
+}
+
+.marquee__group {
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    transform: translate(2rem);
+    animation-name: marquee-scroll-x;
+    animation-timing-function: linear;
+    animation-iteration-count: infinite;
+}
+
+.marquee__item-separator {
+    width: 8px;
+    height: 8px;
+    border-radius: 100%;
+    margin-right: 0.5rem;
+    display: inline-block;
+}
+
+.marquee__item {
+    display: flex;
+    align-items: center;
+    margin-right: 1rem;
+    font-size: 14px;
+}
+
+.marquee__item .name {
+    font-size: 14px;
+    margin-right: 5px;
+}
+
+.marquee__item .source {
+    font-size: 15px;
+    margin-right: 3rem;
+}

@@ -1,0 +1,38 @@
+.desktop .marquee__item:hover {
+    text-decoration: underline;
+}
+
+.marquee__item-time {
+    font-weight: 700;
+    margin-right: 0.5rem;
+}
+
+.marquee__wrapper.yellow,
+.marquee__wrapper.yellow .more-button {
+    background: #ffd200;
+    color: #1e1e1e;
+}
+
+.marquee__wrapper.yellow .marquee__item {
+    color: #1e1e1e;
+}
+
+.marquee__wrapper.yellow .label,
+.marquee__wrapper.yellow .more-button span {
+    background: #1e1e1e;
+    color: #fff;
+}
+
+.marquee__wrapper.yellow .label.integrated {
+    background: transparent;
+    color: inherit;
+    overflow: hidden;
+}
+
+.marquee__wrapper.yellow .marquee__item-separator {
+    background: #1e1e1e;
+}
+
+.marquee__item .source {
+    color: #1e1e1e;
+}
