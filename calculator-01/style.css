@@ -1,0 +1,127 @@
+/*
+ * Project: calculator-01
+ * File: /style.css
+ * File Created: 2026-09-13, 22:13:07
+ * Author: Wojciech Sobczak (wsobczak@gmail.com)
+ * -----
+ * Last Modified: 2026-09-13, 22:47:07
+ * Modified By: Wojciech Sobczak (wsobczak@gmail.com)
+ * -----
+ * Copyright © 2021 - 2026 by vbert
+ */
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    background: #f4f4f4;
+    font-family: Arial, sans-serif;
+}
+
+.calculator-container {
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    gap: 24px;
+    flex-wrap: wrap;
+    width: 100%;
+    padding: 16px;
+}
+
+.calculator {
+    background: white;
+    padding: 20px;
+    border-radius: 15px;
+    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.2);
+    width: min(320px, calc(100vw - 32px));
+}
+
+.display {
+    width: 100%;
+    background: #eee;
+    text-align: right;
+    min-height: 82px;
+    padding: 10px 14px;
+    margin-bottom: 15px;
+    border-radius: 10px;
+}
+
+.expression {
+    min-height: 25px;
+    color: #555;
+    font-size: 15px;
+    font-weight: 400;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.result {
+    min-height: 39px;
+    color: #222;
+    font-size: 30px;
+    font-weight: 700;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.result.error {
+    color: #d32f2f;
+    font-size: 18px;
+}
+
+.buttons {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    grid-template-rows: repeat(5, 60px);
+    gap: 10px;
+}
+
+button {
+    height: 60px;
+    border: none;
+    border-radius: 10px;
+    font-size: 22px;
+    cursor: pointer;
+    background: #3b3c3f;
+    color: white;
+    transition: 0.3s;
+}
+
+button:hover {
+    background: #505155;
+}
+
+button.operator {
+    background: #3498db;
+}
+
+button.operator:hover {
+    background: #2980b9;
+}
+
+button.clear-button {
+    background: #fa6a00;
+}
+
+button.clear-button:hover {
+    background: #d95700;
+}
+
+.zero {
+    grid-column: span 2;
+}
+
+.equals {
+    grid-column: 4;
+    grid-row: 4 / span 2;
+    height: 130px;
+}
